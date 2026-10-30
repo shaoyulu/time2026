@@ -114,21 +114,24 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(20px,5vw,28px);l
   background-image:radial-gradient(rgba(255,255,255,.65) 1px,transparent 1.4px);background-size:3px 4px;opacity:.9}
 .cat-study{--c:var(--study)} .cat-sport{--c:var(--sport)} .cat-play{--c:var(--play)} .cat-life{--c:var(--life)}
 .sw-study{background:var(--study)} .sw-sport{background:var(--sport)} .sw-play{background:var(--play)} .sw-life{background:var(--life)}
-.placed{position:absolute;left:3px;right:3px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 4px 2px 18px;cursor:grab;overflow:hidden}
-.placed .left{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.placed{position:absolute;left:4px;right:4px;display:flex;align-items:flex-start;gap:6px;padding:7px 6px 6px 18px;cursor:grab;overflow:hidden;contain:paint}
+.placed.tight{align-items:center;padding-top:3px;padding-bottom:3px}
+.placed .left{flex:1 1 auto;display:flex;flex-direction:column;gap:2px;min-width:0;line-height:1.2}
 .placed .name{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.placed .when{font-size:10.5px;font-weight:500;opacity:.85;font-variant-numeric:tabular-nums;white-space:nowrap}
+.placed .when{font-size:11px;font-weight:500;opacity:.85;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .placed.tight .when{display:none}
-.placed .ctl{display:flex;gap:3px;flex-shrink:0}
+.placed .ctl{flex:0 0 auto;display:flex;gap:4px}
 .placed .ctl button{height:22px;min-width:22px;border-radius:6px;border:0;background:rgba(255,255,255,.2);color:#fff;font-weight:600;font-size:11px;line-height:22px;padding:0 5px}
+@media (max-width:480px){.placed .name{font-size:12.5px}.placed .ctl{gap:3px}.placed .ctl button{height:20px;min-width:20px;line-height:20px;font-size:10px;padding:0 4px}}
 .placed .ctl button:hover{background:rgba(255,255,255,.32)}
 .placed.dragging{opacity:.25}
 
 /* Tray */
-.tray{padding:12px;gap:12px;overflow-y:auto}
+.tray{padding:12px;gap:12px;overflow-y:auto;overflow-x:hidden}
 .tray h3{margin:0;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.cats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.cat{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:none;border-radius:10px;padding:6px 8px;font-size:12.5px;font-weight:600;color:var(--muted);text-align:left;line-height:1.1}
+.cats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+@media (max-width:520px){.cats{grid-template-columns:minmax(0,1fr)}.tray{padding:10px}}
+.cat{display:flex;align-items:center;gap:6px;min-width:0;border:1px solid var(--line);background:none;border-radius:10px;padding:7px 9px;font-size:12.5px;font-weight:600;color:var(--muted);text-align:left;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cat i{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .cat[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);background:var(--bg)}
 .seg{display:flex;background:var(--bg);border-radius:999px;padding:3px}
@@ -142,7 +145,7 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(20px,5vw,28px);l
 .tblock.selected{outline:2px solid var(--ink);outline-offset:2px}
 .tblock .del{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.25);color:#fff;border:0;font-size:13px;line-height:22px;padding:0;flex-shrink:0}
 .hint{font-size:11.5px;color:var(--muted);margin:0}
-.tray-foot{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+.tray-foot{display:flex;gap:4px 6px;flex-wrap:wrap;margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
 .maker{display:flex;flex-direction:column;gap:8px}
 .maker input{font:inherit;width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
 .chips{display:flex;flex-wrap:wrap;gap:5px}
@@ -305,9 +308,9 @@ function renderBoard(){
   track.innerHTML = Array.from({length:n},(_,i)=>{const m=mins(i);return `<button type="button" class="slot${m%60===0?' q60':(m%30===0?' q30':'')}${selected&&!o[i]?' tap':''}" data-slot="${i}" style="top:calc(var(--u) * ${i})" aria-label="${clockFull(m)}" ${o[i]?'tabindex="-1"':''}>${selected&&!o[i]&&m%30===0?'+':''}</button>`;}).join("") +
     `<div class="bedline" style="top:calc(var(--u) * ${n})"></div><span class="bedtag" style="top:calc(var(--u) * ${n})">Bedtime</span>` +
     (day.length?'':`<div class="empty"><strong>An empty ${DAYS.find(d=>d[0]===cur)[2]}</strong>Pick a category on the right and drag blocks in.</div>`) +
-    day.map(p=>`<div class="block placed cat-${p.cat}${p.len<=2?' tight':''}" data-uid="${p.uid}" style="top:calc(var(--u) * ${p.start} + 2px);height:calc(var(--u) * ${p.len} - 4px)">
-        <div class="left"><span class="name">${esc(p.name)}</span><span class="when">${clock(mins(p.start))} – ${clock(mins(p.start+p.len))} · ${p.len*UNIT} min</span></div>
-        <div class="ctl">${p.flex?`<button type="button" data-op="len" aria-label="Switch to ${p.len===2?60:30} minutes">${p.len===2?'60':'30'}</button>`:''}<button type="button" data-op="remove" aria-label="Remove ${esc(p.name)}">×</button></div>
+    day.map(p=>`<div class="block placed cat-${p.cat}${p.len<=2?' tight':''}" data-uid="${p.uid}" style="top:calc(var(--u) * ${p.start} + 3px);height:calc(var(--u) * ${p.len} - 6px)">
+        <div class="left"><span class="name">${esc(p.name)}</span><span class="when">${clock(mins(p.start))}–${clock(mins(p.start+p.len))}</span></div>
+        <div class="ctl">${p.flex?`<button type="button" data-op="len" aria-label="Switch to ${p.len===2?60:30} minutes">${p.len===2?'60m':'30m'}</button>`:''}<button type="button" data-op="remove" aria-label="Remove ${esc(p.name)}">×</button></div>
       </div>`).join("");
   const tot={study:0,sport:0,play:0,life:0}; let used=0;
   day.forEach(p=>{tot[p.cat]+=p.len*UNIT;used+=p.len*UNIT;});

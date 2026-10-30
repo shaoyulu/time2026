@@ -1,5 +1,5 @@
 // App shell cached for offline use. Bump VERSION when you change files.
-const VERSION = "planner-v3";
+const VERSION = "planner-v4";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon.svg", "icons/icon-192.png", "icons/apple-touch-icon.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
